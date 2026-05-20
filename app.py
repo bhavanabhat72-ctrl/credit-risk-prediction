@@ -14,13 +14,13 @@ scaler = pickle.load(open('scaler.pkl', 'rb'))
 # =========================
 
 st.set_page_config(
-    page_title="Credit Risk Prediction",
+    page_title="Credit Risk Prediction System",
     page_icon="💳",
     layout="wide"
 )
 
 # =========================
-# Title
+# Title Section
 # =========================
 
 st.title("💳 Credit Risk Prediction System")
@@ -92,7 +92,7 @@ with col2:
 
 if st.button("Predict Credit Risk"):
 
-    # 11 features expected by scaler
+    # Model input with 11 features
     input_data = np.array([[
         person_age,
         person_income,
@@ -107,22 +107,52 @@ if st.button("Predict Credit Risk"):
         0
     ]])
 
-    # Scale data
+    # Scale Data
     scaled_data = scaler.transform(input_data)
 
-    # Probability Prediction
+    # ML Prediction Probability
     probability = model.predict_proba(scaled_data)
 
     repay_probability = probability[0][0] * 100
     default_probability = probability[0][1] * 100
 
-    # Custom Risk Threshold
-    if default_probability > 40:
+    # =========================
+    # Manual Risk Logic
+    # =========================
+
+    risk_score = 0
+
+    if person_income < 20000:
+        risk_score += 25
+
+    if loan_amnt > 30000:
+        risk_score += 25
+
+    if loan_int_rate > 18:
+        risk_score += 20
+
+    if loan_percent_income > 0.5:
+        risk_score += 20
+
+    if cb_person_cred_hist_length < 2:
+        risk_score += 10
+
+    # Final Default Probability
+    default_probability = max(default_probability, risk_score)
+
+    repay_probability = 100 - default_probability
+
+    # Final Prediction
+    if default_probability > 50:
         prediction = [1]
     else:
         prediction = [0]
 
     st.write("---")
+
+    # =========================
+    # Result Section
+    # =========================
 
     st.subheader("Prediction Result")
 
@@ -135,7 +165,7 @@ if st.button("Predict Credit Risk"):
         st.success("✅ Low Risk Borrower — Likely to Repay Loan")
 
     # =========================
-    # Probability Section
+    # Probability Display
     # =========================
 
     st.subheader("Prediction Probability")
@@ -168,7 +198,7 @@ if st.button("Predict Credit Risk"):
 
     st.subheader("Loan Recommendation")
 
-    if default_probability > 60:
+    if default_probability > 70:
 
         st.error("❌ Recommendation: Reject Loan")
 
