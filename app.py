@@ -92,7 +92,7 @@ with col2:
 
 if st.button("Predict Credit Risk"):
 
-    # Model input with 11 features
+    # Input Data (11 features expected)
     input_data = np.array([[
         person_age,
         person_income,
@@ -107,7 +107,7 @@ if st.button("Predict Credit Risk"):
         0
     ]])
 
-    # Scale Data
+    # Scale Input
     scaled_data = scaler.transform(input_data)
 
     # ML Prediction Probability
@@ -122,50 +122,70 @@ if st.button("Predict Credit Risk"):
 
     risk_score = 0
 
+    # Low income
     if person_income < 20000:
         risk_score += 25
 
+    # Huge loan
     if loan_amnt > 30000:
         risk_score += 25
 
+    # High interest
     if loan_int_rate > 18:
         risk_score += 20
 
+    # Loan too high compared to income
     if loan_percent_income > 0.5:
         risk_score += 20
 
+    # Poor credit history
     if cb_person_cred_hist_length < 2:
         risk_score += 10
 
-    # Final Default Probability
+    # Final default probability
     default_probability = max(default_probability, risk_score)
 
+    # Final repayment probability
     repay_probability = 100 - default_probability
 
-    # Final Prediction
-    if default_probability > 50:
-        prediction = [1]
+    # =========================
+    # Risk Classification
+    # =========================
+
+    if default_probability >= 70:
+
+        risk_level = "High"
+
+    elif default_probability >= 40:
+
+        risk_level = "Medium"
+
     else:
-        prediction = [0]
+
+        risk_level = "Low"
 
     st.write("---")
 
     # =========================
-    # Result Section
+    # Prediction Result
     # =========================
 
     st.subheader("Prediction Result")
 
-    if prediction[0] == 1:
+    if risk_level == "High":
 
         st.error("⚠️ High Risk Borrower — Likely to Default")
+
+    elif risk_level == "Medium":
+
+        st.warning("⚠️ Medium Risk Borrower — Needs Careful Review")
 
     else:
 
         st.success("✅ Low Risk Borrower — Likely to Repay Loan")
 
     # =========================
-    # Probability Display
+    # Probability Section
     # =========================
 
     st.subheader("Prediction Probability")
@@ -198,11 +218,11 @@ if st.button("Predict Credit Risk"):
 
     st.subheader("Loan Recommendation")
 
-    if default_probability > 70:
+    if risk_level == "High":
 
         st.error("❌ Recommendation: Reject Loan")
 
-    elif default_probability > 40:
+    elif risk_level == "Medium":
 
         st.warning("⚠️ Recommendation: Review Carefully")
 
