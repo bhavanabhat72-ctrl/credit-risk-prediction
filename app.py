@@ -92,7 +92,10 @@ with col2:
 
 if st.button("Predict Credit Risk"):
 
-    # Input Data (11 features expected)
+    # =========================
+    # Model Input
+    # =========================
+
     input_data = np.array([[
         person_age,
         person_income,
@@ -107,45 +110,72 @@ if st.button("Predict Credit Risk"):
         0
     ]])
 
-    # Scale Input
+    # =========================
+    # Scale Input Data
+    # =========================
+
     scaled_data = scaler.transform(input_data)
 
-    # ML Prediction Probability
+    # =========================
+    # ML Prediction
+    # =========================
+
     probability = model.predict_proba(scaled_data)
 
-    repay_probability = probability[0][0] * 100
-    default_probability = probability[0][1] * 100
+    ml_repay_probability = probability[0][0] * 100
+    ml_default_probability = probability[0][1] * 100
 
     # =========================
-    # Manual Risk Logic
+    # Improved Manual Risk Logic
     # =========================
 
     risk_score = 0
 
-    # Low income
-    if person_income < 20000:
-        risk_score += 25
-
-    # Huge loan
-    if loan_amnt > 30000:
-        risk_score += 25
-
-    # High interest
-    if loan_int_rate > 18:
+    # Income Risk
+    if person_income < 15000:
+        risk_score += 35
+    elif person_income < 35000:
         risk_score += 20
 
-    # Loan too high compared to income
-    if loan_percent_income > 0.5:
-        risk_score += 20
+    # Loan Amount Risk
+    if loan_amnt > 40000:
+        risk_score += 30
+    elif loan_amnt > 20000:
+        risk_score += 15
 
-    # Poor credit history
+    # Interest Rate Risk
+    if loan_int_rate > 22:
+        risk_score += 25
+    elif loan_int_rate > 14:
+        risk_score += 15
+
+    # Loan Percent Income Risk
+    if loan_percent_income > 0.7:
+        risk_score += 30
+    elif loan_percent_income > 0.4:
+        risk_score += 15
+
+    # Credit History Risk
     if cb_person_cred_hist_length < 2:
+        risk_score += 20
+    elif cb_person_cred_hist_length < 5:
         risk_score += 10
 
-    # Final default probability
-    default_probability = max(default_probability, risk_score)
+    # Employment Length Risk
+    if person_emp_length < 1:
+        risk_score += 15
+    elif person_emp_length < 3:
+        risk_score += 8
 
-    # Final repayment probability
+    # =========================
+    # Final Probability
+    # =========================
+
+    default_probability = max(ml_default_probability, risk_score)
+
+    if default_probability > 100:
+        default_probability = 100
+
     repay_probability = 100 - default_probability
 
     # =========================
