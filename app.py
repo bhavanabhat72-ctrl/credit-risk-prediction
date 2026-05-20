@@ -93,15 +93,19 @@ with col2:
 if st.button("Predict Credit Risk"):
 
     input_data = np.array([[
-        person_age,
-        person_income,
-        person_emp_length,
-        loan_amnt,
-        loan_int_rate,
-        loan_percent_income,
-        cb_person_cred_hist_length
-    ]])
-
+    person_age,
+    person_income,
+    person_emp_length,
+    loan_amnt,
+    loan_int_rate,
+    loan_percent_income,
+    cb_person_cred_hist_length,
+    0,
+    0,
+    0,
+    0,
+    0
+]])
     # Scale input data
     scaled_data = scaler.transform(input_data)
 
