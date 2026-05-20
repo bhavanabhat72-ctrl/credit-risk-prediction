@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # =========================
-# Title
+# Title Section
 # =========================
 
 st.title("💳 Credit Risk Prediction System")
@@ -92,7 +92,7 @@ with col2:
     )
 
 # =========================
-# Encode Default History
+# Encode Previous Defaults
 # =========================
 
 if previous_loan_defaults == "Yes":
@@ -140,58 +140,58 @@ if st.button("Predict Credit Risk"):
     ml_default_probability = probability[0][1] * 100
 
     # =========================
-    # Manual Risk Logic
+    # Balanced Manual Risk Logic
     # =========================
 
     risk_score = 0
 
     # Income Risk
     if person_income < 15000:
-        risk_score += 35
+        risk_score += 25
     elif person_income < 35000:
-        risk_score += 20
+        risk_score += 12
 
     # Loan Amount Risk
     if loan_amnt > 40000:
-        risk_score += 30
+        risk_score += 20
     elif loan_amnt > 20000:
-        risk_score += 15
+        risk_score += 10
 
     # Interest Rate Risk
     if loan_int_rate > 22:
-        risk_score += 25
+        risk_score += 18
     elif loan_int_rate > 14:
-        risk_score += 15
+        risk_score += 10
 
     # Loan Percent Income Risk
     if loan_percent_income > 0.7:
-        risk_score += 30
+        risk_score += 20
     elif loan_percent_income > 0.4:
-        risk_score += 15
+        risk_score += 10
 
     # Credit History Risk
     if cb_person_cred_hist_length < 2:
-        risk_score += 20
+        risk_score += 15
     elif cb_person_cred_hist_length < 5:
-        risk_score += 10
+        risk_score += 8
 
     # Employment Risk
     if person_emp_length < 1:
-        risk_score += 15
+        risk_score += 10
     elif person_emp_length < 3:
-        risk_score += 8
+        risk_score += 5
 
-    # Previous Default Risk
+    # Previous Loan Default Risk
     if default_history == 1:
-        risk_score += 30
+        risk_score += 20
 
     # =========================
     # Final Probability
     # =========================
 
-    default_probability = max(
-        ml_default_probability,
-        risk_score
+    default_probability = (
+        (ml_default_probability * 0.4) +
+        (risk_score * 0.6)
     )
 
     if default_probability > 100:
@@ -218,7 +218,7 @@ if st.button("Predict Credit Risk"):
     st.write("---")
 
     # =========================
-    # Result Section
+    # Prediction Result
     # =========================
 
     st.subheader("Prediction Result")
@@ -242,7 +242,7 @@ if st.button("Predict Credit Risk"):
         )
 
     # =========================
-    # Probability Display
+    # Probability Section
     # =========================
 
     st.subheader("Prediction Probability")
@@ -251,14 +251,14 @@ if st.button("Predict Credit Risk"):
 
     with col3:
         st.metric(
-            "Repayment Probability",
-            f"{repay_probability:.2f}%"
+            label="Repayment Probability",
+            value=f"{repay_probability:.2f}%"
         )
 
     with col4:
         st.metric(
-            "Default Probability",
-            f"{default_probability:.2f}%"
+            label="Default Probability",
+            value=f"{default_probability:.2f}%"
         )
 
     # =========================
@@ -270,14 +270,16 @@ if st.button("Predict Credit Risk"):
     st.progress(int(default_probability))
 
     # =========================
-    # Recommendation
+    # Loan Recommendation
     # =========================
 
     st.subheader("Loan Recommendation")
 
     if risk_level == "High":
 
-        st.error("❌ Recommendation: Reject Loan")
+        st.error(
+            "❌ Recommendation: Reject Loan"
+        )
 
     elif risk_level == "Medium":
 
@@ -287,7 +289,9 @@ if st.button("Predict Credit Risk"):
 
     else:
 
-        st.success("✅ Recommendation: Approve Loan")
+        st.success(
+            "✅ Recommendation: Approve Loan"
+        )
 
 # =========================
 # Footer
