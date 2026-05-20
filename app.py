@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # =========================
-# Title Section
+# Title
 # =========================
 
 st.title("💳 Credit Risk Prediction System")
@@ -32,7 +32,7 @@ st.write(
 st.write("---")
 
 # =========================
-# Borrower Input Section
+# Input Section
 # =========================
 
 st.header("Enter Borrower Details")
@@ -92,37 +92,35 @@ with col2:
 
 if st.button("Predict Credit Risk"):
 
+    # 11 features expected by scaler
     input_data = np.array([[
-    person_age,
-    person_income,
-    person_emp_length,
-    loan_amnt,
-    loan_int_rate,
-    loan_percent_income,
-    cb_person_cred_hist_length,
-    0,
-    0,
-    0,
-    0
-]])
-    # Scale input data
+        person_age,
+        person_income,
+        person_emp_length,
+        loan_amnt,
+        loan_int_rate,
+        loan_percent_income,
+        cb_person_cred_hist_length,
+        0,
+        0,
+        0,
+        0
+    ]])
+
+    # Scale data
     scaled_data = scaler.transform(input_data)
 
-    # Prediction
-    probability = model.predict_proba(scaled_data)
-
-default_probability = probability[0][1] * 100
-
-if default_probability > 40:
-    prediction = [1]
-else:
-    prediction = [0]
-
-    # Probability
+    # Probability Prediction
     probability = model.predict_proba(scaled_data)
 
     repay_probability = probability[0][0] * 100
     default_probability = probability[0][1] * 100
+
+    # Custom Risk Threshold
+    if default_probability > 40:
+        prediction = [1]
+    else:
+        prediction = [0]
 
     st.write("---")
 
@@ -165,7 +163,7 @@ else:
     st.progress(int(default_probability))
 
     # =========================
-    # Loan Decision
+    # Loan Recommendation
     # =========================
 
     st.subheader("Loan Recommendation")
