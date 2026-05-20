@@ -109,7 +109,14 @@ if st.button("Predict Credit Risk"):
     scaled_data = scaler.transform(input_data)
 
     # Prediction
-    prediction = model.predict(scaled_data)
+    probability = model.predict_proba(scaled_data)
+
+default_probability = probability[0][1] * 100
+
+if default_probability > 40:
+    prediction = [1]
+else:
+    prediction = [0]
 
     # Probability
     probability = model.predict_proba(scaled_data)
