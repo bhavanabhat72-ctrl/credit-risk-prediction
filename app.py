@@ -103,7 +103,6 @@ if st.button("Predict Credit Risk"):
     0,
     0,
     0,
-    0,
     0
 ]])
     # Scale input data
